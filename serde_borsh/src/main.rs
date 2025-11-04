@@ -40,7 +40,7 @@ struct User{
     password: String
 }
 
-fn main() {
+fn _serde() {
     let u = User{
         username: String::from("Arka"),
         password: String::from("1234")
@@ -98,4 +98,69 @@ fn main() {
     //     It can cause your entire program to crash on a single recoverable error.
     //     You lose context about what went wrong.
     //     It bypasses Rust’s safety philosophy — explicit handling of all possibilities.
+}
+
+use borsh::{BorshSerialize , BorshDeserialize};
+
+#[derive(BorshDeserialize,BorshSerialize,Debug,PartialEq)]
+struct User2{
+    id: u64,
+    data: String,
+    v : Vec<u32>
+}
+
+
+fn _borsh(){
+    // BORSH (Binary Object Representation Serializer for Hashing) is a deterministic , binary serialization format often
+    // used in RUST (and other languages) to encode and decode data in a consistent unambiguous way
+
+    // it was originally developed by the NEAR Protocol team for use in smart contract , but you can use it any Rust project that needs a fast, predictable seralization layer.
+
+    // cargo add borsh
+
+    //convert this
+    // [dependencies]
+    // borsh = "1.5.7"
+
+    // into this , to add derive too
+    // [dependencies]
+    // borsh = {version = "1.5.7" , features = ["derive"]}
+
+
+    let main = User2{
+        id:42,
+        data: "Hello, Borsh".into(),
+        v:vec![1,2,3]
+    };
+
+    let mut buffer: Vec<u8> = Vec::new();
+
+    // main.serialize(&mut buffer).unwrap();
+
+    //Deserialize
+    // let deserialize = User2::try_from_slice(&mut buffer).unwrap();
+
+    // assert_eq!(main,deserialize);
+    // println!("Successfully serialized and deserialized: {:?}",buffer);
+    // println!("Successfully serialized and deserialized: {:?}",deserialize);
+
+    //or more safely
+
+    let ans = main.serialize(&mut buffer);
+    match ans{
+        Ok(_) => {
+            println!("Successfully serialized: {:?}",buffer);
+            let deserialize = User2::try_from_slice(&mut buffer);
+            match deserialize {
+                Ok(u) => println!("Successfully deserialized: {:?}",u),
+                Err(_) => println!("Error deserializing struct")
+            }
+        },
+        Err(_) => println!("Error serializing struct")
+    }
+}
+
+fn main(){
+    // _serde();
+    _borsh();
 }
