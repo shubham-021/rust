@@ -160,7 +160,55 @@ fn _borsh(){
     }
 }
 
-fn main(){
+// mod shapes{
+//     pub mod area;
+//     pub mod perimeter;
+// }
+
+// use shapes::{area::square as square_a,perimeter::square as square_p};
+
+
+// fn main(){
     // _serde();
-    _borsh();
+    // let a = square_a(4);
+    // let p = square_p(4);
+    // print!("Area: {}, Perimeter: {}",a,p);
+    // _borsh();
+// }
+
+
+fn lifetimes(){
+    // lifetimes is a contruct that compiler(or more specifically , its borrow checker) uses to ensure all borrows are valid.
+    // Specifically , a variable's lifetime begins when it is created and ends when it is destroyed.
+    // While lifetimes and scope are often referred to together , they are not the same. 
+}
+
+
+// this gives error : missing lifetime specifier
+fn longest_string(s1:&String , s2:&String) -> &String {
+    if s1.len() > s2.len(){
+        return &s1;
+    }else{
+        return &s2;
+    }
+}
+
+fn main(){
+    let str1 = String::from("Shubham");
+    // let str2 = String::from("Singh");
+    // let ans = longest_string(&str1, &str2);
+
+    // lifetime specifier is necessary , what if we do something like
+    let ans;
+    {
+        let str2 = String::from("Singh");
+        ans = longest_string(&str1, &str2);
+    }
+
+    // here ans contains the reference to str2 , if str2 is the bigger string , but str2 doesnt exists outside of its block , so ans is pointing to nothing/dangling pointer
+    // compiler needs to a reference to lifetime of both the string , compiler doesnt know which str is longer , it just implements that can be compiled correctly without if and buts.
+    // if lifetime of str2 is same as ans , then its ok , no problem here , but if str2 lifetime's is valid in its block then its a problem 
+
+
+    println!("{}",ans);
 }
